@@ -14,7 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      addresses: {
+        Row: {
+          address_line: string
+          city: string
+          created_at: string
+          customer_id: string
+          id: string
+          pincode: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          address_line: string
+          city: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          pincode: string
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          address_line?: string
+          city?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          pincode?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "addresses_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          city: string | null
+          created_at: string
+          first_name: string
+          id: string
+          last_name: string
+          phone: string | null
+          pincode: string | null
+          state: string | null
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          first_name: string
+          id?: string
+          last_name: string
+          phone?: string | null
+          pincode?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone?: string | null
+          pincode?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
