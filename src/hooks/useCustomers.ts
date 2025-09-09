@@ -113,7 +113,7 @@ export const useCustomers = () => {
         .from('customers')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
