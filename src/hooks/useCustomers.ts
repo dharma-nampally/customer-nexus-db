@@ -3,21 +3,56 @@ import { supabase } from '@/integrations/supabase/client';
 import { Customer, CustomerFormData } from '@/types/customer';
 import { useToast } from '@/hooks/use-toast';
 
-export const useCustomers = () => {
+interface SearchFilters {
+  city?: string;
+  state?: string;
+  pincode?: string;
+}
+
+interface UseCustomersOptions {
+  page?: number;
+  limit?: number;
+  filters?: SearchFilters;
+}
+
+export const useCustomers = (options: UseCustomersOptions = {}) => {
+  const { page = 1, limit = 10, filters } = options;
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
 
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('customers')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*', { count: 'exact' });
+
+      // Apply filters
+      if (filters?.city) {
+        query = query.ilike('city', `%${filters.city}%`);
+      }
+      if (filters?.state) {
+        query = query.ilike('state', `%${filters.state}%`);
+      }
+      if (filters?.pincode) {
+        query = query.ilike('pincode', `%${filters.pincode}%`);
+      }
+
+      // Apply pagination
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+      
+      query = query
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      const { data, error, count } = await query;
 
       if (error) throw error;
       setCustomers(data || []);
+      setTotalCount(count || 0);
     } catch (error) {
       toast({
         title: "Error",
@@ -129,11 +164,14 @@ export const useCustomers = () => {
 
   useEffect(() => {
     fetchCustomers();
-  }, []);
+  }, [page, limit, filters]);
 
   return {
     customers,
     loading,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: page,
     fetchCustomers,
     createCustomer,
     updateCustomer,
