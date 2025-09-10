@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, UserPlus, Eye } from 'lucide-react';
+import { Users, UserPlus, Eye, LogIn } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-12">
@@ -12,6 +15,14 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Manage your customers and their information efficiently
           </p>
+          {!user && (
+            <Button asChild className="mb-8">
+              <Link to="/auth">
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In to Get Started
+              </Link>
+            </Button>
+          )}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
